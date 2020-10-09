@@ -62,8 +62,9 @@ public class ItemController {
     }
 
     @PostMapping("items/{itemId}/edit")
-    public String updateItem(@ModelAttribute("form") BookForm form) {
+    public String updateItem(@ModelAttribute("form") BookForm form, @PathVariable String itemId) {
 
+        //TODO: DTO 를 만들어서 전달 하는 것으로 바꾸자, 컨트롤러에서 엔티티를 생성 하지 말자
         Book book = new Book();
         book.setId(form.getId());
         book.setName(form.getName());

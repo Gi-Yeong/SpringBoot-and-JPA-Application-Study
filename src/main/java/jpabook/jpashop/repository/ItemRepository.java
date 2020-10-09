@@ -17,6 +17,7 @@ public class ItemRepository {
         if (item.getId() == null) {
             entityManager.persist(item);
         } else {
+            //TODO: merge 말고 dirty checking 방식으로 변경
             entityManager.merge(item);
         }
     }
