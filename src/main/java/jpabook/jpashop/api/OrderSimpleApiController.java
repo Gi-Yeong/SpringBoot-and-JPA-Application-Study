@@ -29,17 +29,28 @@ public class OrderSimpleApiController {
 
     @GetMapping("/api/v1/simple-orders")
     public List<Order> ordersV1() {
-        List<Order> allByString = orderRepository.findAllByString(new OrderSearch());
-        for (Order order : allByString) {
+        List<Order> orders = orderRepository.findAllByString(new OrderSearch());
+        for (Order order : orders) {
             order.getMember().getName(); // Lazy 강제 초기화
             order.getDelivery().getAddress();
         }
-        return allByString;
+        return orders;
     }
 
     @GetMapping("/api/v2/simple-orders")
     public Result ordersV2() {
+        // ORDER 2개
+        // N + 1 -> 1 + 회원 N + 배송 N
         List<Order> orders = orderRepository.findAllByString(new OrderSearch());
+        List<SimpleOrderDto> result = orders.stream()
+                .map(SimpleOrderDto::new)
+                .collect(Collectors.toList());
+        return new Result(result.size(), result);
+    }
+
+    @GetMapping("/api/v3/simple-orders")
+    public Result ordersV3() {
+        List<Order> orders = orderRepository.findAllWithMemberDelivery();
         List<SimpleOrderDto> result = orders.stream()
                 .map(SimpleOrderDto::new)
                 .collect(Collectors.toList());
