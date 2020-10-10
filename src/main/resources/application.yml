@@ -20,4 +20,4 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
-    org.hibernate.type: trace # 로그에 파라미터를 바인딩 해서 남겨 준다
+#    org.hibernate.type: trace # 로그에 파라미터를 바인딩 해서 남겨 준다
