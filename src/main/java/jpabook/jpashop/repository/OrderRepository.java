@@ -93,7 +93,7 @@ public class OrderRepository {
     }
 
     public List<Order> findAllWithMemberDelivery() {
-        return entityManager.createQuery("select distinct o From Order o join fetch o.member m join fetch o.delivery d", Order.class)
+        return entityManager.createQuery("select o From Order o join fetch o.member m join fetch o.delivery d", Order.class)
                 .getResultList();
     }
 }
