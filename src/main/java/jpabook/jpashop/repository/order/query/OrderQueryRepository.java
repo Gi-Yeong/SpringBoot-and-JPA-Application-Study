@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -13,14 +15,44 @@ public class OrderQueryRepository {
     private final EntityManager entityManager;
 
     public List<OrderQueryDto> findOrderQueryDto() {
-        List<OrderQueryDto> orders = findOrders(); // query 1번 -> 결과 N개
+        List<OrderQueryDto> result = findOrders(); // query 1번 -> 결과 N개
 
-        orders.forEach(o -> {
+        result.forEach(o -> {
             List<OrderItemQueryDto> orderItems = findOrderItems(o.getOrderId()); // query N 번
             o.setOrderItems(orderItems);
         });
 
-        return orders;
+        return result;
+    }
+
+    public List<OrderQueryDto> findAllByDto_optimization() {
+        List<OrderQueryDto> result = findOrders();
+
+        Map<Long, List<OrderItemQueryDto>> orderItemMap = findOrderItemMap(toOrderIds(result));
+
+        result.forEach(o -> o.setOrderItems(orderItemMap.get(o.getOrderId())));
+
+        return result;
+    }
+
+    private Map<Long, List<OrderItemQueryDto>> findOrderItemMap(List<Long> orderIds) {
+        List<OrderItemQueryDto> orderItems = entityManager.createQuery("select new jpabook.jpashop.repository.order.query.OrderItemQueryDto(oi.order.id, oi.item.name, oi.item.price, oi.count) " +
+                "From OrderItem oi " +
+                "join oi.item i " +
+                "where oi.order.id in :orderIds", OrderItemQueryDto.class)
+                .setParameter("orderIds", orderIds)
+                .getResultList();
+
+        Map<Long, List<OrderItemQueryDto>> orderItemMap = orderItems.stream()
+                .collect(Collectors.groupingBy(OrderItemQueryDto::getOrderId));
+        return orderItemMap;
+    }
+
+
+    private List<Long> toOrderIds(List<OrderQueryDto> result) {
+        List<Long> orderIds = result.stream().map(o -> o.getOrderId())
+                .collect(Collectors.toList());
+        return orderIds;
     }
 
     private List<OrderItemQueryDto> findOrderItems(Long orderId) {
@@ -39,4 +71,5 @@ public class OrderQueryRepository {
                 "join o.delivery d", OrderQueryDto.class)
                 .getResultList();
     }
+
 }
