@@ -48,7 +48,7 @@ dependencies {
 }
 
 //querydsl 추가
-def querydslDir = 'src/main/generated'
+def querydslDir = 'src/main/generated/querydsl'
 
 querydsl {
     library = "com.querydsl:querydsl-apt"
