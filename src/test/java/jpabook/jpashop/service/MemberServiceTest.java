@@ -41,7 +41,7 @@ public class MemberServiceTest {
 
         //then
         entityManager.flush();
-        assertEquals(member, memberRepository.findOne(savedId));
+        assertEquals(member, memberRepository.findById(savedId));
     }
 
     @Test(expected = IllegalStateException.class)
